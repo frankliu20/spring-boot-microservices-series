@@ -1,54 +1,56 @@
 package com.sivalabs.oauth2server;
-
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Order(-5)
-public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfigurer {
 
-    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Override
-    @Bean
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-        return super.userDetailsServiceBean();
-    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .requestMatchers(matchers -> matchers
-                .requestMatchers("/login", "/oauth/authorize", "/oauth/confirm_access"))
+            .authorizeRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers("/login", "/oauth/authorize", "/oauth/confirm_access").permitAll())
             .authorizeRequests(requests -> requests
                 .anyRequest().authenticated())
             .formLogin(login -> login.loginPage("/login").permitAll());
+        return http.build();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .inMemoryAuthentication()
-            .passwordEncoder(passwordEncoder())
-            .withUser("admin").password(passwordEncoder().encode("admin")).roles("USER", "ADMIN")
-            .and()
-            .withUser("siva").password(passwordEncoder().encode("siva")).roles("USER");
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails admin = User.withUsername("admin")
+            .password(passwordEncoder().encode("admin"))
+            .roles("USER", "ADMIN")
+            .build();
+        UserDetails siva = User.withUsername("siva")
+            .password(passwordEncoder().encode("siva"))
+            .roles("USER")
+            .build();
+        return new InMemoryUserDetailsManager(admin, siva);
     }
 }
