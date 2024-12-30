@@ -5,7 +5,6 @@ import com.sivalabs.catalogservice.repositories.ProductRepository;
 import com.sivalabs.catalogservice.utils.MyThreadLocalsHolder;
 import com.sivalabs.catalogservice.web.models.ProductInventoryResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final InventoryServiceClient inventoryServiceClient;
 
-    @Autowired
     public ProductService(ProductRepository productRepository, InventoryServiceClient inventoryServiceClient) {
         this.productRepository = productRepository;
         this.inventoryServiceClient = inventoryServiceClient;

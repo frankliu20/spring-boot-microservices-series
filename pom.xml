@@ -23,6 +23,9 @@
         <module>shoppingcart-ui</module>
 		<module>zipkin-server</module>
 	</modules>
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+    </properties>
 
 
 </project>

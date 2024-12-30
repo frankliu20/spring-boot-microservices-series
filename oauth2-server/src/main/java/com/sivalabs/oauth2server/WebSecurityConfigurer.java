@@ -15,13 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Order(-5)
 public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
-    @Override
+    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    @Override
+    /*~~(Migrate manually based on https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter)~~>*/@Override
     @Bean
     public UserDetailsService userDetailsServiceBean() throws Exception {
         return super.userDetailsServiceBean();
@@ -35,13 +35,11 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .requestMatchers()
-            .antMatchers("/login", "/oauth/authorize", "/oauth/confirm_access")
-            .and()
-            .authorizeRequests()
-            .anyRequest().authenticated()
-            .and()
-            .formLogin().loginPage("/login").permitAll();
+            .requestMatchers(matchers -> matchers
+                .requestMatchers("/login", "/oauth/authorize", "/oauth/confirm_access"))
+            .authorizeRequests(requests -> requests
+                .anyRequest().authenticated())
+            .formLogin(login -> login.loginPage("/login").permitAll());
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.sivalabs.inventoryservice.entities;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Data
 @Entity

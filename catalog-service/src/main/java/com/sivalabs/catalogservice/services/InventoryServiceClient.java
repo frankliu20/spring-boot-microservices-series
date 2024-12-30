@@ -5,7 +5,6 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.sivalabs.catalogservice.utils.MyThreadLocalsHolder;
 import com.sivalabs.catalogservice.web.models.ProductInventoryResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ public class InventoryServiceClient {
     private static final String INVENTORY_API_PATH = "http://inventory-service/api/";
 
 
-    @Autowired
     public InventoryServiceClient(RestTemplate restTemplate, InventoryServiceFeignClient inventoryServiceFeignClient) {
         this.restTemplate = restTemplate;
         this.inventoryServiceFeignClient = inventoryServiceFeignClient;

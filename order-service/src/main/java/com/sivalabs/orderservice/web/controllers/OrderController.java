@@ -2,7 +2,6 @@ package com.sivalabs.orderservice.web.controllers;
 
 import com.sivalabs.orderservice.entities.Order;
 import com.sivalabs.orderservice.repositories.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -12,7 +11,6 @@ public class OrderController {
 
     private OrderRepository repo;
 
-    @Autowired
     public OrderController(OrderRepository repo) {
         this.repo = repo;
     }
