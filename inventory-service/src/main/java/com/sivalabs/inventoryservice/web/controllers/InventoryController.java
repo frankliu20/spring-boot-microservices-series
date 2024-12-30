@@ -1,11 +1,11 @@
 package com.sivalabs.inventoryservice.web.controllers;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.sivalabs.inventoryservice.entities.InventoryItem;
 import com.sivalabs.inventoryservice.repositories.InventoryItemRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.CircuitBreaker;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +23,7 @@ public class InventoryController {
     }
 
     @GetMapping("/api/inventory/{productCode}")
-    @HystrixCommand
+    @CircuitBreaker
     public ResponseEntity<InventoryItem> findInventoryByProductCode(@PathVariable String productCode) {
         log.info("Finding inventory for product code :"+productCode);
         Optional<InventoryItem> inventoryItem = inventoryItemRepository.findByProductCode(productCode);
@@ -35,7 +35,7 @@ public class InventoryController {
     }
 
     @GetMapping("/api/inventory")
-    @HystrixCommand
+    @CircuitBreaker
     public List<InventoryItem> getInventory() {
         log.info("Finding inventory for all products ");
         return inventoryItemRepository.findAll();

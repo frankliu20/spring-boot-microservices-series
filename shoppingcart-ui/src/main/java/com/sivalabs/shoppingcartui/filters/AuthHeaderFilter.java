@@ -1,44 +1,32 @@
 package com.sivalabs.shoppingcartui.filters;
 
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+@Component
+public class AuthHeaderFilter extends AbstractGatewayFilterFactory<AuthHeaderFilter.Config> {
 
-public class AuthHeaderFilter extends ZuulFilter {
-    @Override
-    public String filterType() {
-        return PRE_TYPE;
+    public AuthHeaderFilter() {
+        super(Config.class);
     }
 
     @Override
-    public int filterOrder() {
-        return 0;
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            if (!exchange.getRequest().getHeaders().containsKey("AUTH_HEADER")) {
+                String sessionId = UUID.randomUUID().toString();
+                exchange = exchange.mutate()
+                    .request(r -> r.headers(headers -> headers.add("AUTH_HEADER", sessionId)))
+                    .build();
+            }
+            return chain.filter(exchange);
+        };
     }
 
-    @Override
-    public boolean shouldFilter() {
-        //RequestContext ctx = RequestContext.getCurrentContext();
-
-        return true;
-    }
-
-    @Override
-    public Object run() throws ZuulException {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-
-        if (request.getAttribute("AUTH_HEADER") == null) {
-            //generate or get AUTH_TOKEN, ex from Spring Session repository
-            String sessionId = UUID.randomUUID().toString();
-            //request.setAttribute("AUTH_HEADER", sessionId);
-            ctx.addZuulRequestHeader("AUTH_HEADER", sessionId);
-        }
-        return null;
+    public static class Config {
+        // Put the configuration properties here
     }
 }

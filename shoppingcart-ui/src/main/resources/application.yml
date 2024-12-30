@@ -1,0 +1,8 @@
+spring:
+    cloud:
+        gateway:
+            routes:
+                - id: shopping_cart_route
+                  uri: http://localhost:8080
+                  filters:
+                      - name: AuthHeaderFilter
